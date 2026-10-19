@@ -1,0 +1,41 @@
+{
+  "entry": "./src/composition.ts",
+  "fps": 60,
+  "duration": 46.55,
+  "width": 1920,
+  "height": 1080,
+  "seed": 1,
+  "stamp": true,
+  "params": {
+    "type": "object",
+    "properties": {
+      "first": {
+        "title": "Name, first part",
+        "description": "Lands on the last hit.",
+        "type": "string",
+        "maxLength": 12,
+        "default": "SHADER"
+      },
+      "second": {
+        "title": "Name, second part",
+        "description": "Lands after the hall goes quiet.",
+        "type": "string",
+        "maxLength": 12,
+        "default": "ERA"
+      },
+      "slogan": {
+        "title": "Slogan",
+        "type": "string",
+        "maxLength": 48,
+        "default": "The programmable era of ads."
+      }
+    }
+  },
+  "variants": {
+    "reel": {
+      "label": "9:16 (Shorts, Reels)",
+      "width": 1080,
+      "height": 1920
+    }
+  }
+}

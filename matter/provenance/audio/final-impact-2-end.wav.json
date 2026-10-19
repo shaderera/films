@@ -1,0 +1,14 @@
+{
+  "format": "shaderera.provenance/1",
+  "file": "audio/final-impact-2-end.wav",
+  "sha256": "6581af873bd05ed8074ec1be1d8e7c3897d164216c4303d9322251d112b0668f",
+  "source": "Shaderera, made with Suno; the film's ending (a hall tail on the last cadence) cut in code",
+  "licence": "Not MIT: owned by Shaderera, all rights reserved",
+  "author": "Shaderera",
+  "title": "Final Impact",
+  "credit": "Final Impact, Shaderera · Not MIT: owned by Shaderera, all rights reserved",
+  "fetched": "2026-10-10",
+  "flags": [
+    "ai-generated"
+  ]
+}
