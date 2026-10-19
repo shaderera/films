@@ -9,6 +9,7 @@ licences beside it.
 | Film | Category | Length | Ratios |
 |---|---|---|---|
 | [logo-frames](logo-frames/) | Logo reveal | 6 s | 16:9, 9:16 |
+| [matter](matter/) | Title | 46.55 s | 16:9, 9:16 |
 
 ## Fork a film
 
@@ -31,3 +32,6 @@ with its source and licence.
 The code is MIT ([LICENSE](LICENSE)). Fonts, pictures and sound keep their own licences, listed in
 each film's `ASSETS.md`. Names and logos shown as film defaults (such as "wallloom") are their
 owners' marks; the MIT licence does not grant them. Change them with the film's params.
+
+Some films carry a song that is not MIT (MATTER's "Final Impact" is Shaderera's own); its
+`ASSETS.md` says so. Use your own song in your film.

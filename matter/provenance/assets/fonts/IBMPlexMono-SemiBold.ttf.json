@@ -1,0 +1,11 @@
+{
+  "format": "shaderera.provenance/1",
+  "file": "assets/fonts/IBMPlexMono-SemiBold.ttf",
+  "sha256": "d3c38e55c78f5b0f28009fddba4834ec503278936a5986032424c9bd2d23aa46",
+  "source": "https://github.com/google/fonts/tree/main/ofl/ibmplexmono",
+  "licence": "SIL OFL 1.1",
+  "author": "IBM (Mike Abbink, Bold Monday)",
+  "title": "IBM Plex Mono SemiBold",
+  "credit": "IBM Plex Mono SemiBold, IBM (Mike Abbink, Bold Monday) · SIL OFL 1.1",
+  "fetched": "2026-10-09"
+}

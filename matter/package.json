@@ -1,0 +1,22 @@
+{
+  "name": "matter",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check": "shaderera check",
+    "still": "shaderera still",
+    "render": "shaderera render",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@shaderera/core": "^0.1.4",
+    "wgpu-matrix": "3.4.2"
+  },
+  "devDependencies": {
+    "@webgpu/types": "0.1.74",
+    "shaderera": "^0.1.4",
+    "typescript": "6.0.3",
+    "vite": "8.3.0",
+    "webgpu": "0.6.2"
+  }
+}

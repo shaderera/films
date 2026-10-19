@@ -1,0 +1,11 @@
+{
+  "format": "shaderera.provenance/1",
+  "file": "assets/fonts/IBMPlexMono-Regular.ttf",
+  "sha256": "6a3412f058c7d8dfd9170c41e85ade48e5156ecb89356110ca57a0a27734af46",
+  "source": "https://github.com/google/fonts/tree/main/ofl/ibmplexmono",
+  "licence": "SIL OFL 1.1",
+  "author": "IBM (Mike Abbink, Bold Monday)",
+  "title": "IBM Plex Mono Regular",
+  "credit": "IBM Plex Mono Regular, IBM (Mike Abbink, Bold Monday) · SIL OFL 1.1",
+  "fetched": "2026-10-09"
+}
