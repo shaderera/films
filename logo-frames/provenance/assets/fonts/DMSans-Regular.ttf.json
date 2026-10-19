@@ -1,0 +1,11 @@
+{
+  "format": "shaderera.provenance/1",
+  "file": "assets/fonts/DMSans-Regular.ttf",
+  "sha256": "92c89c9001560a4207084e714b0e8805134b649c070d4eb3760554569a8972d8",
+  "source": "https://fonts.google.com/specimen/DM+Sans (via wallloom theme fonts, packages/theme/fonts/DMSans-latin.woff2, instanced wght 400, opsz 14 with fontTools)",
+  "licence": "SIL OFL 1.1",
+  "author": "Colophon Foundry / Google Fonts (DM Sans)",
+  "title": "DM Sans Regular (wght 400, opsz 14)",
+  "credit": "DM Sans Regular (wght 400, opsz 14), Colophon Foundry / Google Fonts (DM Sans) · SIL OFL 1.1",
+  "fetched": "2026-10-19"
+}

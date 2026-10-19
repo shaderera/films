@@ -1,0 +1,11 @@
+{
+  "format": "shaderera.provenance/1",
+  "file": "assets/fonts/DMSans-Light.ttf",
+  "sha256": "0d95d5d026724835c2357609ecbd27f7c679fbf30bb5e1c417dadd671d647b90",
+  "source": "wallloom theme fonts (packages/theme/fonts), via D:/shaderera/wallloom-art-opening/assets/fonts",
+  "licence": "SIL OFL 1.1",
+  "author": "Colophon Foundry / Google Fonts (DM Sans)",
+  "title": "DM Sans Light (wght 300, opsz 40)",
+  "credit": "DM Sans Light (wght 300, opsz 40), Colophon Foundry / Google Fonts (DM Sans) · SIL OFL 1.1",
+  "fetched": "2026-10-19"
+}

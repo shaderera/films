@@ -1,0 +1,36 @@
+{
+  "entry": "./src/composition.ts",
+  "fps": 30,
+  "duration": 6,
+  "width": 1920,
+  "height": 1080,
+  "seed": 1,
+  "stamp": true,
+  "params": {
+    "type": "object",
+    "properties": {
+      "wordmark": {
+        "title": "Wordmark",
+        "type": "string",
+        "default": "wallloom"
+      },
+      "before": {
+        "title": "Tagline before the pieces",
+        "type": "string",
+        "default": "ANY ART, FRAME, SIZE,"
+      },
+      "after": {
+        "title": "Tagline after the pieces",
+        "type": "string",
+        "default": "ANYWHERE"
+      }
+    }
+  },
+  "variants": {
+    "reel": {
+      "label": "9:16 (Shorts, Reels)",
+      "width": 1080,
+      "height": 1920
+    }
+  }
+}
