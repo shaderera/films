@@ -12,16 +12,19 @@
       "wordmark": {
         "title": "Wordmark",
         "type": "string",
+        "maxLength": 16,
         "default": "wallloom"
       },
       "before": {
         "title": "Tagline before the pieces",
         "type": "string",
+        "maxLength": 32,
         "default": "ANY ART, FRAME, SIZE,"
       },
       "after": {
         "title": "Tagline after the pieces",
         "type": "string",
+        "maxLength": 16,
         "default": "ANYWHERE"
       }
     }

@@ -15,6 +15,9 @@ the end of wallloom's opening film, in beats at 100.05 BPM.
 | `before` | `ANY ART, FRAME, SIZE,` | the tagline before the pictures |
 | `after` | `ANYWHERE` | the tagline's last word(s), pushed out by the row |
 
+Longer words shrink the type to fit: the widest line, with the row of five open, stays inside
+the frame (96% of the width in 16:9, 92% upright).
+
 ## Variants
 
 - `main`: 1920×1080.

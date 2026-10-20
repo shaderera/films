@@ -115,9 +115,15 @@ const open: Open = async (host) => {
     thumbs.push({ c, w: img.width, h: img.height })
   }
 
-  if (upright) {
-    // The widest second line (the full row, the line open, the last word) at u = 1, scaled to fit.
-    u = 1
+  {
+    // Every line at its widest (the full row, the line open) at u = 1, so long params shrink the
+    // type to fit instead of running off the frame. Upright is always fitted, as large as the
+    // widest line allows; landscape keeps its size unless a line would pass the edge.
+    const probe = io.canvas(8, 8).getContext('2d') as unknown as CanvasRenderingContext2D
+    const width = (text: string, st: { family: string; size: number; tracking: number }) => {
+      probe.font = `100px "${st.family}"`
+      return [...text].reduce((a, c) => a + (probe.measureText(c).width / 100) * st.size + st.tracking * st.size, 0)
+    }
     const st = TYPE.tagline
     const itemH = st.size * 1.6
     let row = 0
@@ -126,10 +132,11 @@ const open: Open = async (host) => {
       row += itemH * 0.62 * (th.w / th.h) + 2 * itemH * 0.19
     }
     row += (BEATS.row - 1) * itemH * 0.24 + 2 * itemH * 0.32
-    const probe = io.canvas(8, 8).getContext('2d') as unknown as CanvasRenderingContext2D
-    probe.font = `100px "${st.family}"`
-    const last = [...copy.after].reduce((a, c) => a + (probe.measureText(c).width / 100) * st.size + st.tracking * st.size, 0)
-    u = Math.min(0.62 * W, (0.92 * W) / (row + last))
+    const mark = width(copy.wordmark, TYPE.wordmark)
+    const before = width(copy.before, st)
+    const after = width(copy.after, st)
+    if (upright) u = Math.min(0.62 * W, (0.92 * W) / Math.max(row + after, before, mark))
+    else u = Math.min(u, (0.96 * W) / Math.max(before + width(' ', st) + row + after, mark))
   }
 
   const frame = io.canvas(W, H)
