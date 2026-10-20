@@ -1,4 +1,6 @@
-# matter
+# Shaderera opening film
+
+Folder: `matter`
 
 Two million particles as one body that never cuts: a line drawn by the song, a landscape grown
 octave by octave, a city, a black hole, shards, waves, minimal surfaces. Every transition is a
