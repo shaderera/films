@@ -6,10 +6,10 @@ licences beside it.
 
 ## Films
 
-| Film | Category | Length | Ratios |
-|---|---|---|---|
-| [logo-frames](logo-frames/) | Logo reveal | 6 s | 16:9, 9:16 |
-| [matter](matter/) | Title | 46.55 s | 16:9, 9:16 |
+| Film | Folder | Category | Length | Ratios |
+|---|---|---|---|---|
+| [Motion design for an art frame brand](logo-frames/) | `logo-frames` | Logo reveal | 6 s | 16:9, 9:16 |
+| [Shaderera opening film](matter/) | `matter` | Title | 46.55 s | 16:9, 9:16 |
 
 ## Fork a film
 

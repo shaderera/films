@@ -1,4 +1,6 @@
-# logo-frames
+# Motion design for an art frame brand
+
+Folder: `logo-frames`
 
 A logo end card on white: the wordmark over a tagline that parts before its last word. A small
 framed picture pops into the gap and changes on every half beat, the gap widens to a row of five,
