@@ -33,5 +33,5 @@ The code is MIT ([LICENSE](LICENSE)). Fonts, pictures and sound keep their own l
 each film's `ASSETS.md`. Names and logos shown as film defaults (such as "wallloom") are their
 owners' marks; the MIT licence does not grant them. Change them with the film's params.
 
-Some films carry a song that is not MIT (MATTER's "Final Impact" is Shaderera's own); its
-`ASSETS.md` says so. Use your own song in your film.
+Some films carry a song that is not MIT (MATTER's "Final Impact" is under Suno's paid plan
+licence); its `ASSETS.md` says so. Use your own song in your film.
