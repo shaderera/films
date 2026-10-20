@@ -57,8 +57,8 @@ needs the score's bars moved too.
 
 ## Assets
 
-- Song: "Final Impact", made with Suno. It is owned by Shaderera, and it is **not** MIT: it is
-  here so the film plays as it was made. Use your own song in your film.
+- Song: "Final Impact", made with Suno on a paid plan, under Suno's paid plan licence. It is
+  **not** MIT: it is here so the film plays as it was made. Use your own song in your film.
 - Fonts: IBM Plex Mono Regular and SemiBold, STIX Two Text Italic (SIL OFL 1.1).
 
 Sources and hashes are in [ASSETS.md](ASSETS.md); the records are in `provenance/`.
