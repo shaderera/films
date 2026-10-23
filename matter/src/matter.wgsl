@@ -475,11 +475,18 @@ fn rotate(v: vec3f, axis: vec3f, a: f32) -> vec3f {
   return v * c + cross(axis, v) * sin(a) + axis * dot(axis, v) * (1.0 - c);
 }
 
+// DXIL has no calls, so each call site of a heavy function is one more inlined copy of it, and
+// compile time grows with them. Each heavy function (formAt, shape, place) is called from one site,
+// in a loop whose count comes from the state, so the compiler cannot unroll it into copies again.
+
 fn shape(q: vec2f, h: u32, s: State) -> vec4f {
-  var a = formAt(s.form.x, q, h, s);
   let m = s.form.z;
+  // The form, and while it morphs, the form it becomes.
+  var f: array<vec4f, 2>;
+  for (var k = 0; k < select(1, 2, m > 0.0); k++) { f[k] = formAt(select(s.form.x, s.form.y, k == 1), q, h, s); }
+  var a = f[0];
   if (m > 0.0) {
-    let b = formAt(s.form.y, q, h, s);
+    let b = f[1];
     let e = crossing(q, s);
     a = mix(a, b, e);
     let t = s.morph.y * sin(PI * e);
@@ -490,15 +497,16 @@ fn shape(q: vec2f, h: u32, s: State) -> vec4f {
 
 // One particle's place: the shape, broken into shards, pulled to a point, placed in the world.
 fn place(q: vec2f, h: u32, s: State) -> vec4f {
-  var p = shape(q, h, s);
   let T0 = s.shard.x;
+  let n = s.shard.y;
+  var fid = vec2i(0);
+  var fq = vec2f(0.0);
+  var sid = 0u;
+  var T = 0.0;
   if (T0 > 0.0) {
-    let n = s.shard.y;
     let c = q * n;
     let ci = vec2i(floor(c));
     var best = 9.0;
-    var fid = vec2i(0);
-    var fq = vec2f(0.0);
     for (var y = -1; y <= 1; y++) {
       for (var x = -1; x <= 1; x++) {
         let id = ci + vec2i(x, y);
@@ -507,20 +515,24 @@ fn place(q: vec2f, h: u32, s: State) -> vec4f {
         if (d < best) { best = d; fid = id; fq = f; }
       }
     }
-    let sid = pcg((bitcast<u32>(fid.x) * 7919u) ^ (bitcast<u32>(fid.y) * 104729u));
+    sid = pcg((bitcast<u32>(fid.x) * 7919u) ^ (bitcast<u32>(fid.y) * 104729u));
     let cells = i32(n);
     shardId = (((fid.y % cells) + cells) % cells) * cells + (((fid.x % cells) + cells) % cells);
     let delay = floor(rnd(sid) * 8.0) * s.vox.y;
-    let T = max(0.0, T0 - delay);
-    if (T > 0.0) {
-      let centre = shape(fq / n, h, s).xyz;
-      let away = normalize(centre + vnoise3(vec3f(f32(fid.x), f32(fid.y), 0.0) * 0.37, 63u) * 0.8 + vec3f(0.0, 0.001, 0.0));
-      let speed = s.shard.z * (0.4 + rnd(sid ^ 5u));
-      let axis = normalize(vnoise3(vec3f(f32(fid.x), f32(fid.y), 1.0) * 0.73, 64u) + vec3f(0.0, 0.0, 0.001));
-      let ang = T * s.shard.w * (rnd(sid ^ 9u) - 0.5) * 2.0;
-      let crack = 1.0 - 0.12 * min(T * 6.0, 1.0);
-      p = vec4f(centre + away * speed * T + rotate(p.xyz - centre, axis, ang) * crack, p.w + 0.3 * exp(-T * 3.0));
-    }
+    T = max(0.0, T0 - delay);
+  }
+  // The particle's shape, and while its shard flies, the shape at the shard's centre.
+  var at: array<vec4f, 2>;
+  for (var k = 0; k < select(1, 2, T > 0.0); k++) { at[k] = shape(select(q, fq / n, k == 1), h, s); }
+  var p = at[0];
+  if (T > 0.0) {
+    let centre = at[1].xyz;
+    let away = normalize(centre + vnoise3(vec3f(f32(fid.x), f32(fid.y), 0.0) * 0.37, 63u) * 0.8 + vec3f(0.0, 0.001, 0.0));
+    let speed = s.shard.z * (0.4 + rnd(sid ^ 5u));
+    let axis = normalize(vnoise3(vec3f(f32(fid.x), f32(fid.y), 1.0) * 0.73, 64u) + vec3f(0.0, 0.0, 0.001));
+    let ang = T * s.shard.w * (rnd(sid ^ 9u) - 0.5) * 2.0;
+    let crack = 1.0 - 0.12 * min(T * 6.0, 1.0);
+    p = vec4f(centre + away * speed * T + rotate(p.xyz - centre, axis, ang) * crack, p.w + 0.3 * exp(-T * 3.0));
   }
   let c = s.morph.w;
   if (c > 0.0) {
@@ -684,12 +696,20 @@ fn scramble(q: vec2f, s: State) -> vec2f {
   let frame = u32(g.res.z);
   let shutter = rnd(h ^ pcg(frame + 0x3c6ef372u));
 
-  let p0 = place(q, h, s0);
+  // Where the particle was (p0, the shutter's start), two neighbours a little along the sheet for its
+  // normal (pu, pv), and where it is (p1). p1 goes last, after shardId is reset, so shardId is p1's
+  // shard. The count comes from a uniform, so the loop is not unrolled.
   let du = 0.6 / f32(side);
-  let pu = place(q + vec2f(du, 0.0), h, s1).xyz;
-  let pv = place(q + vec2f(0.0, du), h, s1).xyz;
-  shardId = -1;
-  let p1 = place(q, h, s1);
+  let offsets = array<vec2f, 4>(vec2f(0.0), vec2f(du, 0.0), vec2f(0.0, du), vec2f(0.0));
+  var ps: array<vec4f, 4>;
+  for (var k = 0; k < select(4, 0, side == 0u); k++) {
+    if (k == 3) { shardId = -1; }
+    ps[k] = place(q + offsets[k], h, st[pop * 2u + select(1u, 0u, k == 0)]);
+  }
+  let p0 = ps[0];
+  let pu = ps[1].xyz;
+  let pv = ps[2].xyz;
+  let p1 = ps[3];
   // Blobs: a copy while the form is copied, a shard while it is broken, otherwise one of 16 × 16 blocks
   // of the square. A blob is the same thing from frame to frame, so its number is its identity.
   var blob = shardId;
