@@ -1,6 +1,6 @@
 # Authoring a Shaderera film
 
-For the person and the agent making or revising a film in this project (Shaderera 0.1.4). The
+For the person and the agent making or revising a film in this project (Shaderera 0.1.5). The
 project is ordinary code: `render(t)` in `src/`, metadata in `shaderera.json`, and this project's
 ids, params and requirements in its `README.md`. There is no scene format to fill in: the film is
 the source. The reference is in `node_modules/shaderera/docs/` (below, `docs/`: the protocol,
@@ -18,8 +18,9 @@ determinism, the CLI, MCP, delivery, and `participants/` per renderer); the task
    never from a default of the engine.
 3. **Resolve the assets.** Use the real model, images and fonts, with their licences recorded in
    `ASSETS.md` (source, licence, sha256). If the product is missing, say so and stop or design an
-   original object openly. Never present a primitive placeholder as the product. Use footage or
-   pictures from outside sources only when the brief or the person asks (`guides/footage.md`).
+   original object openly. Never present a primitive placeholder as the product. Use footage,
+   pictures or sounds from outside sources only when the brief or the person asks
+   (`guides/footage.md`, `guides/audio.md`).
    A new project has no font: use the brand's font files from the person, otherwise ask (the
    order, and how `io.font` loads one, are in `guides/typography.md`).
 4. **Write the direction down** in `DIRECTION.md`, in whatever form the film needs: it guides the
@@ -46,9 +47,9 @@ A frame is one layer or a stack of them: a canvas, RGBA bytes, or a `GPUTexture`
 
 Plugins are code that earlier films proved. What you add is copied into the project and is its
 own code from then on. The `shaderera-plugins` skill says how to search and add, and how to
-recover when a `shaderera` command refuses a project whose `shaderera.item.json` requires a
-package plugin that is not installed. A new project has it in `.claude/skills/shaderera-plugins/`;
-`npx skills add` puts it in `.agents/skills/` for other agents. The commands are in
+recover when a `shaderera` command refuses a project whose `shaderera.json` requires a
+package plugin that is not installed. The Claude Code plugin installs it in Claude Code, and
+`npx skills add shaderera/shaderera` in other agents. The commands are in
 `docs/plugins.md`.
 
 What is on the shelf:
@@ -56,12 +57,20 @@ What is on the shelf:
 - **Plumbing**, which carries no taste. An agent may add one of these instead of writing the same
   plumbing again, and says so:
   - `audio-beat-clock`: measure a song (tempo, bars, onsets, bands), and a clock;
+  - `motion-eases`: eases, clamp, lerp, the progress of t through a span, an envelope over hits;
+  - `motion-random`: seeded random numbers, a hash of an integer (the same in WGSL) and a stream;
   - `audio-listen`: the takes of a recording that match a description, heard by CLAP, each
     landed by its peak on a hit point;
   - `text-timed-cues`: lyrics and subtitles (LRC, SRT, VTT, Whisper or STT JSON), the line and word at t;
+  - `text-fit`: the size that fits a width, word wrap (Thai too), a line's width at a tracking, the lines as text runs for review;
+  - `motion-shot-list`: film time to shots, the transition's progress and the source frame at t;
   - `render-three-host`: three.js on the host's GPU;
-  - `render-image-textures`: PNG and JPEG decoded the same in Node and the browser;
+  - `render-three-textures`: images from `io.image` as three.js textures and atlases;
+  - `image-to-png`: WebP, AVIF, GIF and video frames converted to PNG once (ffmpeg);
+  - `render-canvas-texture`: a Canvas2D canvas or RGBA bytes as a GPU texture for a WGSL pass;
+  - `render-srgb`: the sRGB transfer functions, display values to linear light and back, WGSL and CPU;
   - `render-gltf-read`: glTF and GLB models read into plain arrays, matrices and materials;
+  - `image-fit`: a still into a box of a Canvas2D frame, cover or contain, drawn small the same every time;
   - `image-regions`: named regions of a photograph (mask, box, centre), from SAM 3.1 or painted masks;
   - `render-gaussian-splats`: Gaussian splats on the host's GPU with a deterministic sort;
   - `render-bvh`: ray queries against a mesh's triangles on the GPU, closest hit and any hit;
@@ -73,7 +82,7 @@ What is on the shelf:
   - `asset-provenance`: where each outside file came from, the ASSETS.md table and the credits.
 - **Looks, motion and sound design** are added only when the person asks: `look-blur`,
   `look-screen-passes`, `look-paper-edges`, `look-row-glitch`, `look-film-grain`,
-  `look-tonemap`, `look-vignette`, `text-kinetic`, `text-feature-captions`, `text-code-wall`,
+  `look-tonemap`, `look-vignette`, `text-scramble`, `text-glitch-titles`, `text-code-wall`,
   `text-glyph-morph`, `motion-keyframes`, `camera-keyframes`, `camera-shake`, `camera-ken-burns`,
   `format-safe-areas`, `format-broadcast-slate`, `audio-hall-ending`, `audio-voice-repace`.
 - **Fonts:** `font-ibm-plex-mono`, `font-ibm-plex-sans`, `font-instrument-serif` and
@@ -102,6 +111,10 @@ The CLI and MCP can only show and change what the source exposes.
   at closely, so `still --object` can find it.
 - **Params** are a JSON Schema in `shaderera.json` with titles and good defaults, for the few
   controls a non-programmer wants. If a param overrides a literal, say so in the README.
+- **Variants** (`16:9`, `9:16`, a cutdown) are outputs the film lays itself out for. The source
+  is opened with the variant's size in `host.manifest` and its name in `host.variant`
+  (`undefined` for the manifest's own output): lay out by the name, not by guessing from the
+  width and height.
 - **`pick(t, x, y)`** returns `{ id, point? }` through the camera in effect, so a click selects.
 
 ## Keep it deterministic
@@ -119,6 +132,23 @@ A film whose frames take seconds, or that is rendered partly outside the host, n
 that already exist. Use them, and tell the person what is running and how far it is: a long
 command that prints nothing looks frozen.
 
+- **Keep `open` light.** `open` runs in every host: each `--workers` host of a render, each chunk,
+  each `still`, `check` and `review`. Work only `audio()` needs (a music bed made in code, a mix)
+  goes in `audio()`, which runs once and only when the sound is wanted: a 28-minute film that
+  made its bed sample by sample in `open` paid 57 s in every host for frames that never used it.
+  Derived bytes that are the same every run (a decoded pyramid, an analysis) go through
+  `io.cache`, so they are made once, not once a host.
+- **Close each clip when its shot ends.** A clip's decoder holds its buffers until `close()` or
+  the end of the render, in every host: a film of about 60 clips that closed none grew to about
+  3.5 GB a host and could not run more than three. `frame(i)` after `close()` opens it again, with
+  the same bytes.
+- **Per-pixel work on the GPU.** A pass over every pixel in JavaScript (`getImageData`, a loop,
+  `putImageData`) costs about 15 ms a 1080p frame; the same levels or grade in a WGSL pass over
+  `host.gpu`, or a `look-*` plugin, costs well under one.
+- **Measure before guessing.** `NODE_OPTIONS=--cpu-prof npx shaderera render --trusted --from 10
+  --to 14` writes one `.cpuprofile` for the CLI and one for each host (without `--trusted` a host
+  cannot write it): open them in Chrome DevTools, Performance, and see whether the time is in
+  `open`, in the film's draw or waiting.
 - **Check with fewer frames.** `check` renders every timestamp twice; at 5 s a frame, the default
   50 take over eight minutes. `npx shaderera check --times 4` still compares two orders.
 - **Render in the background with progress.** `npx shaderera render --progress 2> render.log`
@@ -136,6 +166,30 @@ command that prints nothing looks frozen.
   approved variant: `npx shaderera still 4 16.9 --variant final --compare animatic --sheet`. It
   writes each pair side by side with PSNR and mean ΔE; it measures and never judges, so look at
   the pairs and say what differs.
+
+## HDR10
+
+A film that computes more light than SDR shows can deliver HDR10 as well, when the person asks
+for it. It opts in with an `hdr10` block in `shaderera.json`; the mastering display is the one the
+person graded on, so ask for it rather than choosing one:
+
+```json
+"hdr10": { "mastering": { "peak": 1000, "min": 0.0001, "primaries": "p3-d65" }, "dither": "tpdf" }
+```
+
+The source then reads `host.range`. In `hdr10` its float `GPUTexture` layers declare their light
+(`light: { transfer: 'linear', primaries: 'bt2020' }`, linear 1.0 at 203 cd/m²); canvases and
+bytes stay SDR and are placed at Graphics White. In `sdr` the film tone-maps its own light, with
+its own code or a plugin, and returns no layer with `light`: the SDR version is the film's own
+render, never derived from the HDR one. Look at the SDR render; read the HDR one as numbers.
+
+```sh
+npx shaderera check --hdr10
+npx shaderera deliver --hdr10 --sdr --master
+```
+
+That makes the HDR10 master (HEVC Main 10, or ProRes with `--format`) and the film's own SDR
+render beside it. It needs ffmpeg 9.0 and WebGPU; `docs/delivery.md`, "HDR10", has the rest.
 
 ## Before you finish
 
