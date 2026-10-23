@@ -51,8 +51,10 @@ every frame). After replacing the song, measure it again:
 node tools/analyze-music.ts audio/<song>.wav audio/<song>.analysis.json
 ```
 
-Then point `SONG` and `ANALYSIS` in `src/matter.ts` at the new files, and set the new tempo and
-first bar in `src/clock.ts`. The score is written in this song's bars, so a song with another form
+Then point `SONG` and `ANALYSIS` in `src/clock.ts` at the new files, and set the new tempo and
+first bar there. The film does not hash the song when it opens; `npm run check` (and
+`npm run share`) first runs `node tools/check-analysis.ts`, which fails if the analysis was
+measured from other bytes than `SONG`. The score is written in this song's bars, so a song with another form
 needs the score's bars moved too.
 
 ## Assets

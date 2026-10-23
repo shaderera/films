@@ -1,7 +1,7 @@
 // Measures the song the film is cut to: node tools/analyze-music.ts [song] [out.json]
 // Writes audio/final-impact-2-end.analysis.json: tempo and beat grid, onsets with strength, band energy every
 // frame (sub, low, mid, high), silences, and section boundaries. The source file's sha256 is
-// recorded so the film can refuse an analysis of other bytes. Measurements only; what they mean is
+// recorded so tools/check-analysis.ts can refuse an analysis of other bytes. Measurements only; what they mean is
 // decided in the film's code.
 
 import { execFileSync } from 'node:child_process'

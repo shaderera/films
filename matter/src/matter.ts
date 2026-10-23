@@ -2,24 +2,17 @@
 // render asks the score for the frame at t and executes it.
 
 import type { Host, Json, Source } from '@shaderera/core'
-import { BAR, BAR1, FPS } from './clock.ts'
+import { ANALYSIS, BAR, BAR1, FPS, SONG } from './clock.ts'
 import { createMatter, PARTICLES } from './gpu.ts'
 import { lorenz } from './attractor.ts'
 import { glyphPoints } from './glyph.ts'
 import { type Audio, frameAt } from './score.ts'
 import { createType } from './type.ts'
 
-const SONG = 'audio/final-impact-2-end.wav'
-const ANALYSIS = 'audio/final-impact-2-end.analysis.json'
 const MARK_FACE = 'IBM Plex Mono SemiBold'
 const TAG_FACE = 'IBM Plex Mono Regular'
 const ITALIC_FACE = 'STIX Two Text Italic'
 const CODE = ['src/score.ts', 'src/matter.wgsl']
-
-const sha256 = async (bytes: Uint8Array) => {
-  const digest = await crypto.subtle.digest('SHA-256', new Uint8Array(bytes))
-  return Array.from(new Uint8Array(digest), (b) => b.toString(16).padStart(2, '0')).join('')
-}
 
 // The params (shaderera.json): the name lands in two parts, first then second, and the slogan
 // decodes under it.
@@ -31,8 +24,18 @@ export const openMatter = async (host: Host): Promise<Source> => {
   const first = text(host.params.first, COPY.first).toUpperCase()
   const second = text(host.params.second, COPY.second).toUpperCase()
   const slogan = text(host.params.slogan, COPY.slogan)
-  const analysis = JSON.parse(new TextDecoder().decode(await host.io.read(ANALYSIS)))
-  if (analysis.of.sha256 !== (await sha256(await host.io.read(SONG)))) throw new Error(`${ANALYSIS} was measured from other bytes than ${SONG}; run node tools/analyze-music.ts`)
+  const decode = (bytes: Uint8Array) => new TextDecoder().decode(bytes)
+  // Every read is independent, so they run at once. The song is not read here: the sound is mixed
+  // from audio(), and that the analysis was measured from the song's bytes is checked before a
+  // share by tools/check-analysis.ts (npm run check), not by every viewer.
+  const [analysis, code] = await Promise.all([
+    host.io.read(ANALYSIS).then((bytes) => JSON.parse(decode(bytes))),
+    // The film's own source, which the type layer shows: everything on screen is this code.
+    Promise.all(CODE.map(async (name) => ({ name, lines: decode(await host.io.read(name)).split('\n').filter((l) => l.trim()) }))),
+    host.io.font('assets/fonts/IBMPlexMono-SemiBold.ttf', MARK_FACE),
+    host.io.font('assets/fonts/IBMPlexMono-Regular.ttf', TAG_FACE),
+    host.io.font('assets/fonts/STIXTwoText-Italic[wght].ttf', ITALIC_FACE),
+  ])
 
   // Band energy per frame, in dB below each band's peak, read as 0–1 over the top 40 dB.
   const bands = analysis.bands as { fps: number; sub: number[]; low: number[]; mid: number[]; high: number[] }
@@ -42,15 +45,10 @@ export const openMatter = async (host: Host): Promise<Source> => {
     return [level(bands.sub[i]), level(bands.low[i]), level(bands.mid[i]), level(bands.high[i])]
   }
 
-  await host.io.font('assets/fonts/IBMPlexMono-SemiBold.ttf', MARK_FACE)
-  await host.io.font('assets/fonts/IBMPlexMono-Regular.ttf', TAG_FACE)
-  await host.io.font('assets/fonts/STIXTwoText-Italic[wght].ttf', ITALIC_FACE)
   const logo = glyphPoints(host, MARK_FACE, first, second)
   const { width: W, height: H } = host.manifest
   const typeCanvas = host.io.canvas(W, H)
   const typeCtx = typeCanvas.getContext('2d') as OffscreenCanvasRenderingContext2D
-  // The film's own source, which the type layer shows: everything on screen is this code.
-  const code = await Promise.all(CODE.map(async (name) => ({ name, lines: new TextDecoder().decode(await host.io.read(name)).split('\n').filter((l) => l.trim()) })))
   const drawType = createType({ mono: TAG_FACE, bold: MARK_FACE, italic: ITALIC_FACE }, code, { slogan, label: `${first}${second} / MATTER` })
   const matter = await createMatter(host, host.gpu, logo.points, logo.split, lorenz(), TAG_FACE)
 
