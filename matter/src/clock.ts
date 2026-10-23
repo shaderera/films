@@ -3,6 +3,9 @@
 // is at 0.446 s; bars keep the song's numbers.
 // The picture asks this clock for every time it uses.
 
+export const SONG = 'audio/final-impact-2-end.wav'
+/** The song measured by tools/analyze-music.ts; tools/check-analysis.ts checks it is of SONG's bytes. */
+export const ANALYSIS = 'audio/final-impact-2-end.analysis.json'
 export const FPS = 60
 export const DURATION = 46.55
 export const BPM = 174.3

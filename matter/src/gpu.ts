@@ -182,9 +182,10 @@ export const createMatter = async (host: Host, device: GPUDevice, logo: Float32A
   const { width: W, height: H } = host.manifest
   const decoder = new TextDecoder()
   const code = async (name: string) => decoder.decode(await host.io.read(`src/${name}`))
-  const matter = device.createShaderModule({ code: await code('matter.wgsl') })
-  const post = device.createShaderModule({ code: await code('post.wgsl') })
-  const track = device.createShaderModule({ code: await code('track.wgsl') })
+  const [matterCode, postCode, trackCode] = await Promise.all(['matter.wgsl', 'post.wgsl', 'track.wgsl'].map(code))
+  const matter = device.createShaderModule({ code: matterCode })
+  const post = device.createShaderModule({ code: postCode })
+  const track = device.createShaderModule({ code: trackCode })
 
   const S = GPUBufferUsage.STORAGE, D = GPUBufferUsage.COPY_DST, U = GPUBufferUsage.UNIFORM
   const globals = device.createBuffer({ size: 48, usage: U | D })

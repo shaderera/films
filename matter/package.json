@@ -4,7 +4,9 @@
   "license": "MIT",
   "type": "module",
   "scripts": {
-    "check": "shaderera check",
+    "check": "node tools/check-analysis.ts && shaderera check",
+    "preshare": "node tools/check-analysis.ts",
+    "share": "shaderera share",
     "still": "shaderera still",
     "render": "shaderera render",
     "typecheck": "tsc --noEmit"
