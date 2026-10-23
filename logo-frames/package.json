@@ -10,11 +10,11 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@shaderera/core": "^0.1.5"
+    "@shaderera/core": "^0.1.6"
   },
   "devDependencies": {
     "@webgpu/types": "0.1.74",
-    "shaderera": "^0.1.5",
+    "shaderera": "^0.1.6",
     "typescript": "6.0.3",
     "vite": "8.3.5",
     "webgpu": "0.6.2"
